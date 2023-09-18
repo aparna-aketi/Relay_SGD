@@ -303,7 +303,7 @@ def run(rank, size):
     elif args.arch.lower() == 'vgg11':
         model = vgg11(num_classes=args.classes, dataset=args.dataset, norm_type=args.normtype, groups=2)
     elif args.arch.lower() == 'mobilenet':
-        model = MobileNetV2(num_classes=args.classes, dataset=args.dataset, norm_type=args.normtype, groups=2)
+        model = MobileNetV2(num_classes=args.classes, norm_type=args.normtype, groups=2)
     elif args.arch.lower() == 'cganet':
         model = cganet5(num_classes=args.classes, dataset=args.dataset, norm_type=args.normtype, groups=2)
     else:
@@ -312,8 +312,14 @@ def run(rank, size):
     if rank==0:
         print(args)
         print('Printing model summary...')
-        if 'cifar' in args.dataset: print(summary(model, (3, 32, 32), batch_size=int(args.batch_size/size), device='cpu'))
-        else: print(summary(model, (3, 224, 224), batch_size=int(args.batch_size/size), device='cpu'))
+        if args.dataset=="fmnist":
+            print(summary(model, (1,28,28), batch_size=int(args.batch_size/size), device='cpu'))
+        elif args.dataset=="imagenette_full":
+            print(summary(model, (3, 224, 224), batch_size=int(args.batch_size/size), device='cpu'))
+        elif args.dataset=="imagenet":
+            print(summary(model, (3, 224, 224), batch_size=int(args.batch_size/size), device='cpu'))
+        else: 
+            print(summary(model, (3, 32, 32), batch_size=int(args.batch_size/size), device='cpu'))
         
 
     graph = ChainGraph(rank, size, args.devices) 
